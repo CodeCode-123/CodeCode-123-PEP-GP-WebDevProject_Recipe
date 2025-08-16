@@ -16,14 +16,43 @@ window.addEventListener("DOMContentLoaded", () => {
      * - Admin link and logout button
      * - Search input
     */
+   let addRecipeNameInput = document.getElementById("add-recipe-name-input");
+   let addRecipeInstructionsInput = document.getElementById("add-recipe-instructions-input");
+   let addRecipeSubmitButton = document.getElementById("add-recipe-submit-input");
+
+   let updateRecipeNameInput = document.getElementById("update-recipe-name-input");
+   let updateRecipeInstructionsInput = document.getElementById("update-recipe-instructions-input");
+   let updateRecipeSubmitButton = document.getElementById("update-recipe-submit-input");
+
+   let deleteRecipeNameInput = document.getElementById("delete-recipe-name-input");
+   let deleteRecipeSubmitButton = document.getElementById("delete-recipe-submit-input");
+
+   let recipeListContainer = document.getElementById("recipe-list");
+
+   let adminLink = document.getElementById("admin-link");
+   let logoutButton = document.getElementById("logout-button");
+
+   let searchInput = document.getElementById("search-input");
+   let searchInputButton = document.getElementById("search-button");
+
+   let recipes = [];
 
     /*
      * TODO: Show logout button if auth-token exists in sessionStorage
      */
+    const token = sessionStorage.getItem("auth-token").trim();
+    if (token.length > 0) {
+        logoutButton.style.visibility = "visible";
+    }
+
 
     /*
      * TODO: Show admin link if is-admin flag in sessionStorage is "true"
      */
+    const isAdmin = sessionStorage.getItem("is-admin").trim();
+    if (isAdmin === "true") {
+        adminLink.style.visibility = "visible";
+    }
 
     /*
      * TODO: Attach event handlers
@@ -33,10 +62,17 @@ window.addEventListener("DOMContentLoaded", () => {
      * - Search button → searchRecipes()
      * - Logout button → processLogout()
      */
+    addRecipeSubmitButton.addEventListener("click", addRecipe);
+    updateRecipeSubmitButton.addEventListener("click", updateRecipe);
+    deleteRecipeSubmitButton.addEventListener("click", deleteRecipe);
+    searchInputButton.addEventListener("click", searchRecipes);
+    logoutButton.addEventListener("click", processLogout);
+
 
     /*
      * TODO: On page load, call getRecipes() to populate the list
      */
+    window.onload = getRecipes;
 
 
     /**
@@ -48,6 +84,20 @@ window.addEventListener("DOMContentLoaded", () => {
      */
     async function searchRecipes() {
         // Implement search logic here
+        const searchTermInputValue = searchInput.value.trim();
+        try {
+            const response = await fetch(BASE_URL + "/recipes/recipe-page.html?name=" + searchTermInputValue);
+
+            if (response.ok) {
+                refreshRecipeList();
+            } else {
+                console.error("Error fetching data:", response.status, response.statusText);
+                alert("Search recipes failed.");
+            }
+        } catch(error) {
+            console.error("Error:", error);
+            alert("Search recipes failed.");
+        }
     }
 
     /**
@@ -60,6 +110,38 @@ window.addEventListener("DOMContentLoaded", () => {
      */
     async function addRecipe() {
         // Implement add logic here
+        const addRecipeNameInputValue = addRecipeNameInput.value.trim();
+        const addRecipeInstructionsInputValue = addRecipeInstructionsInput.value.trim();
+        const token = sessionStorage.getItem("auth-token").trim();
+        if (addRecipeNameInputValue.length > 0 && 
+            addRecipeInstructionsInputValue.length > 0 && 
+            token.length > 0) {
+            try {
+                const response = await fetch(BASE_URL + "/recipes/recipe-page.html", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(new Recipe(addRecipeNameInputValue, addRecipeInstructionsInputValue))
+                });
+                
+                if (response.status === 201) {
+                    addRecipeNameInput.value = "";
+                    addRecipeInstructionsInput.value = "";
+                    getRecipes();
+                    refreshRecipeList();
+                } else {
+                    console.error("Error fetching data:", response.status, response.statusText);
+                    alert("Add recipe failed.");
+                }
+            } catch(error) {
+                console.error("Error:", error);
+                alert("Add recipe failed.");
+            }
+        } else {
+            alert("Add recipe failed.");
+        }
     }
 
     /**
@@ -72,6 +154,44 @@ window.addEventListener("DOMContentLoaded", () => {
      */
     async function updateRecipe() {
         // Implement update logic here
+        const updateRecipeNameInputValue = updateRecipeNameInput.value.trim();
+        const updateRecipeInstructionsInputValue = updateRecipeInstructionsInput.value.trim();
+        if (updateRecipeNameInputValue.length > 0 && updateRecipeInstructionsInputValue.length > 0) {
+            const elements = recipes;
+            for (const element of elements) {
+                if (element.textContent === updateRecipeNameInputValue) {
+                    const id = element.getId();
+                    element.setInstructions(updateRecipeInstructionsInputValue);
+                    if (id) {
+                        try {
+                            const response = fetch(BASE_URL + `/recipes/recipe-page.html/${id}`, {
+                                method: "PUT",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify(element)
+                            });
+
+                            if (response.ok) {
+                                updateRecipeNameInput.value = "";
+                                updateRecipeInstructionsInput.value = "";
+                                getRecipes();
+                                refreshRecipeList();
+                            } else {
+                                console.error("Error fetching data:", response.status, response.statusText);
+                                alert("Update recipe failed.");
+                            }
+                        } catch(error) {
+                            console.error("Error:", error);
+                            alert("Update recipe failed.");
+                        }
+                    }
+                    break;
+                }
+            }
+        } else {
+            alert("Update recipe failed.");
+        }
     }
 
     /**
@@ -83,6 +203,38 @@ window.addEventListener("DOMContentLoaded", () => {
      */
     async function deleteRecipe() {
         // Implement delete logic here
+        const deleteRecipeNameInputValue = deleteRecipeNameInput.value.trim();
+        const elements = recipes;
+        let isFound = false;
+        for (const element of elements) {
+            if (element.textContent === deleteRecipeNameInputValue) {
+                const id = element.getId();
+                isFound = true;
+                if (id) {
+                    try {
+                        const response = await fetch(BASE_URL + `/recipes/recipe-page.html/${id}`, {
+                            method: "DELETE"
+                        });
+
+                        if (response.ok) {
+                            deleteRecipeNameInput.value = "";
+                            getRecipes();
+                            refreshRecipeList();
+                        } else {
+                            console.error("Error fetching data:", response.status, response.statusText);
+                            alert("Delete recipe failed.");
+                        }
+                    } catch(error) {
+                        console.error("Error:", error);
+                        alert("Delete recipe failed.");
+                    }
+                }
+                break;
+            }
+        }
+        if (isFound === false) {
+            alert("Recipe not found.");
+        }
     }
 
     /**
@@ -93,6 +245,28 @@ window.addEventListener("DOMContentLoaded", () => {
      */
     async function getRecipes() {
         // Implement get logic here
+        try {
+            const response = await fetch(BASE_URL + "/recipes/recipe-page.html");
+
+            if (response.ok) {
+                let data = await response.json();
+                for (let i = 0; i < data.length; i++) {
+                    const id = data[i].getId();
+                    const name = data[i].getName();
+                    const instructions = data[i].getInstructions();
+                    const author = data[i].getAuthor();
+                    recipes.push(new Recipe(id, name, instructions, author));
+                }
+
+                refreshRecipeList();
+            } else {
+                console.error("Error fetching data:", response.status, response.statusText);
+                alert("Get recipes failed.");
+            }
+        } catch(error) {
+            console.error("Error:", error);
+            alert("Get recipes failed.");
+        }
     }
 
     /**
@@ -103,6 +277,19 @@ window.addEventListener("DOMContentLoaded", () => {
      */
     function refreshRecipeList() {
         // Implement refresh logic here
+        while (recipeListContainer.firstChild) {
+            recipeListContainer.removeChild(recipeListContainer.firstChild);
+        }
+        for (let i = 0; i < recipes.length; i++) {
+            const recipe = recipes[i];
+            const name = recipe.getName();
+            const instructions = recipe.getInstructions();
+            const li = document.createElement("li");
+            const p = document.createElement("p");
+            p.textContent = recipe.getName() + ": " + recipe.getInstructions();
+            li.appendChild(p);
+            recipeListContainer.appendChild(li);
+        }
     }
 
     /**
@@ -114,6 +301,33 @@ window.addEventListener("DOMContentLoaded", () => {
      */
     async function processLogout() {
         // Implement logout logic here
+        const token = sessionStorage.getItem("auth-token").trim();
+        try {
+            const response = await fetch(BASE_URL + "/logout", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                sessionStorage.setItem("auth-token", "");
+                sessionStorage.setItem("is-admin", "false");
+
+                logoutButton.style.visibility = "hidden";
+
+                setTimeout(function() {
+                    window.location.href = "http://localhost:8081/login"
+                }, 500);
+            } else {
+                console.error("Error fetching data:", response.status, response.statusText);
+                alert("Process logout failed.");
+            }
+        } catch(error) {
+            console.error("Error:", error);
+            alert("Process logout failed.");
+        }
     }
 
 });
