@@ -91,6 +91,11 @@ window.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(BASE_URL + "/recipes?name=" + searchTermInputValue);
 
             if (response.ok) {
+                const data = await response.json();
+                recipes = [];
+                for (let i = 0; i < data.length; i++) {
+                    recipes.push(data[i]);
+                }
                 refreshRecipeList();
             } else {
                 console.error("Error fetching data:", response.status, response.statusText);
@@ -174,11 +179,11 @@ window.addEventListener("DOMContentLoaded", () => {
         const updateRecipeNameInputValue = updateRecipeNameInput.value.trim();
         const updateRecipeInstructionsInputValue = updateRecipeInstructionsInput.value.trim();
         if (updateRecipeNameInputValue.length > 0 && updateRecipeInstructionsInputValue.length > 0) {
-            const elements = recipes;
-            for (const element of elements) {
-                if (element.textContent === updateRecipeNameInputValue) {
-                    const id = element.getId();
-                    element.setInstructions(updateRecipeInstructionsInputValue);
+            for (let i = 0; i < recipes.length; i++) {
+                if (recipes[i].name === updateRecipeNameInputValue) {
+                    const id = recipes[i].id;
+                    recipes[i].instructions = updateRecipeInstructionsInputValue;
+                    refreshRecipeList();
                     if (id) {
                         try {
                             const response = fetch(BASE_URL + `/recipes/${id}`, {
@@ -186,13 +191,12 @@ window.addEventListener("DOMContentLoaded", () => {
                                 headers: {
                                     "Content-Type": "application/json"
                                 },
-                                body: JSON.stringify(element)
+                                body: JSON.stringify(recipes[i])
                             });
 
                             if (response.ok) {
                                 updateRecipeNameInput.value = "";
                                 updateRecipeInstructionsInput.value = "";
-                                getRecipes();
                                 refreshRecipeList();
                             } else {
                                 console.error("Error fetching data:", response.status, response.statusText);
@@ -223,11 +227,10 @@ window.addEventListener("DOMContentLoaded", () => {
         // Implement delete logic here
         try {
             const deleteRecipeNameInputValue = deleteRecipeNameInput.value.trim();
-            const elements = recipes;
             let isFound = false;
-            for (const element of elements) {
-                if (element.textContent === deleteRecipeNameInputValue) {
-                    const id = element.getId();
+            for (let i = 0; i < recipes.length; i++) {
+                if (recipes[i].name === deleteRecipeNameInputValue) {
+                    const id = recipes[i].id;
                     isFound = true;
                     if (id) {
                         const response = await fetch(BASE_URL + `/recipes/${id}`, {
@@ -236,7 +239,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
                         if (response.ok) {
                             deleteRecipeNameInput.value = "";
-                            //getRecipes();
+                            getRecipes();
                             refreshRecipeList();
                         } else {
                             //alert("Delete recipe failed.");
@@ -268,12 +271,13 @@ window.addEventListener("DOMContentLoaded", () => {
             const response = await fetch(BASE_URL + "/recipes");
 
             if (response.ok) {
+                recipes = [];
                 let data = await response.json();
                 for (let i = 0; i < data.length; i++) {
-                    const id = data[i].getId();
-                    const name = data[i].getName();
-                    const instructions = data[i].getInstructions();
-                    const author = data[i].getAuthor();
+                    const id = data[i].id;
+                    const name = data[i].name;
+                    const instructions = data[i].instructions;
+                    const author = data[i].author;
                     const newObject = {
                         id: id,
                         name: name,
@@ -282,7 +286,6 @@ window.addEventListener("DOMContentLoaded", () => {
                     }
                     recipes.push(newObject);
                 }
-
                 refreshRecipeList();
             } else {
                 console.error("Error fetching data:", response.status, response.statusText);
@@ -302,9 +305,10 @@ window.addEventListener("DOMContentLoaded", () => {
      */
     function refreshRecipeList() {
         // Implement refresh logic here
-        while (recipeListContainer.firstChild) {
-            recipeListContainer.removeChild(recipeListContainer.firstChild);
-        }
+        // while (recipeListContainer.firstChild) {
+        //     recipeListContainer.removeChild(recipeListContainer.firstChild);
+        // }
+        recipeListContainer.innerHTML = "";
         for (let i = 0; i < recipes.length; i++) {
             const recipe = recipes[i];
             const name = recipe.name;

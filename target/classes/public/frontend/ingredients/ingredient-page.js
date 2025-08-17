@@ -17,6 +17,7 @@ const BASE_URL = "http://localhost:8081"; // backend URL
     let deleteIngredientNameInput = document.getElementById("delete-ingredient-name-input");
     let deleteIngredientSubmitButton = document.getElementById("delete-ingredient-submit-button");
     let ingredientListContainer = document.getElementById("ingredient-list");
+    let searchInput = document.getElementById("search-input");
     let backLink = document.getElementById("back-link");
     let adminLink = document.getElementById("admin-link");
 
@@ -113,10 +114,11 @@ async function getIngredients() {
         const response = await fetch(BASE_URL + "/ingredients");
 
         if (response.ok) {
+            ingredients = [];
             let data = await response.json();
             for (let i = 0; i < data.length; i++) {
-                const id = data[i].getId;
-                const name = data[i].getName;
+                const id = data[i].id;
+                const name = data[i].name;
                 const newObject = {
                     id: id,
                     name: name
@@ -149,13 +151,11 @@ async function getIngredients() {
 async function deleteIngredient() {
     // Implement delete ingredient logic here
     let deleteIngredientNameInputValue = deleteIngredientNameInput.value.trim();
-    const elements = ingredients;
     let isFound = false;
-    for (let i = 0; i < elements.length; i++) {
-        const element = elements[i];
-        if (element.textContent == deleteIngredientNameInputValue) {
+    for (let i = 0; i < ingredients.length; i++) {
+        if (ingredients[i].name == deleteIngredientNameInputValue) {
             isFound = true;
-            const id = element.getId();
+            const id = ingredients[i].id;
             if (id) {
                 try {
                     const response = await fetch(BASE_URL + `/ingredients/${id}`, {
@@ -198,14 +198,14 @@ async function deleteIngredient() {
  */
 function refreshIngredientList() {
     // Implement ingredient list rendering logic here
-    while (ingredientListContainer.firstChild) {
-        ingredientListContainer.removeChild(ingredientListContainer.firstChild);
-    }
+    // while (ingredientListContainer.firstChild) {
+    //     ingredientListContainer.removeChild(ingredientListContainer.firstChild);
+    // }
+    ingredientListContainer.innerHTML = "";
     for (let i = 0; i < ingredients.length; i++) {
-        const ingredient = ingredients[i];
         let li = document.createElement("li");
         let p = document.createElement("p");
-        p.textContent = ingredient.getName();
+        p.textContent = ingredient[i].name;
         li.appendChild(p);
         ingredientListContainer.appendChild(li);
     }
