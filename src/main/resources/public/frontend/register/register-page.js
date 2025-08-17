@@ -88,7 +88,7 @@ async function processRegistration() {
                 });
                 
                 if (response.status === 201) {
-                    setTimeout(function() {
+                    setTimeout(function(){
                         window.location.href = "../login/login-page.html";
                     }, 500);
                 } else if (response.status === 409) {

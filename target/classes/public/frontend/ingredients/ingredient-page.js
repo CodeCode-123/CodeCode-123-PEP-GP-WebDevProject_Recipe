@@ -87,6 +87,7 @@ async function addIngredient() {
                 refreshIngredientList();
             } else {
                 console.error("Error fetching data:", response.status, response.statusText);
+                alert("Adding ingredient failed.");
             }
         } catch (error) {
             console.error("Error:", error);
@@ -177,8 +178,7 @@ async function deleteIngredient() {
                 }
             }
             break;
-        }
-
+        }     
     }
     if (isFound === false) {
         //alert("Ingredient not found.");

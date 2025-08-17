@@ -42,8 +42,8 @@ window.addEventListener("DOMContentLoaded", () => {
     /*
      * TODO: Show logout button if auth-token exists in sessionStorage
      */
-    const token = sessionStorage.getItem("auth-token").trim();
-    if (token.length > 0) {
+    const token = sessionStorage.getItem("auth-token");
+    if (token != null && token.trim().length > 0) {
         logoutButton.style.visibility = "visible";
     }
 
@@ -55,6 +55,7 @@ window.addEventListener("DOMContentLoaded", () => {
     if (isAdmin === "true") {
         adminLink.style.visibility = "visible";
     }
+
 
     /*
      * TODO: Attach event handlers
@@ -69,6 +70,12 @@ window.addEventListener("DOMContentLoaded", () => {
     deleteRecipeSubmitButton.addEventListener("click", deleteRecipe);
     searchInputButton.addEventListener("click", searchRecipes);
     logoutButton.addEventListener("click", processLogout);
+    deleteRecipeSubmitButton.addEventListener("click", function() {
+        if (sessionStorage.getItem("is-admin") != "true" || sessionStorage.getItem("auth-token") == null) {
+            alert("Not admin");
+        }
+    });
+  
 
 
     /*
@@ -225,6 +232,9 @@ window.addEventListener("DOMContentLoaded", () => {
      */
     async function deleteRecipe() {
         // Implement delete logic here
+        if (sessionStorage.getItem("auth-token") == null) {
+            alert("Not admin");
+        } 
         try {
             const deleteRecipeNameInputValue = deleteRecipeNameInput.value.trim();
             let isFound = false;
@@ -242,19 +252,19 @@ window.addEventListener("DOMContentLoaded", () => {
                             getRecipes();
                             refreshRecipeList();
                         } else {
-                            //alert("Delete recipe failed.");
+                            alert("Delete recipe failed.");
                             console.error("Error fetching data:", response.status, response.statusText); 
                         }
-                        break;
                     }
+                    break;
                 } 
             }  
             if (isFound === false) {
-                //alert("Recipe not found.");
+                alert("Recipe not found.");
                 console.error("Error:", error);
             }
         } catch(error) {
-            // alert("Delete recipe failed.");
+            alert("Delete recipe failed.");
             console.error("Error:", error);
         }
     }
@@ -347,7 +357,6 @@ window.addEventListener("DOMContentLoaded", () => {
                 sessionStorage.setItem("is-admin", "false");
 
                 //logoutButton.style.visibility = "hidden";
-                
                 setTimeout(function() {
                     window.location.href = "../login/login-page.html";
                 }, 500);
