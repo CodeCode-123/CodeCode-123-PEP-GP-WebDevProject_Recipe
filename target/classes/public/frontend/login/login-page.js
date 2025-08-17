@@ -22,6 +22,7 @@ let logoutButton = document.getElementById("logout-button");
  */
 loginButton.addEventListener("click", processLogin);
 
+
 /**
  * TODO: Process Login Function
  * 
@@ -74,21 +75,15 @@ async function processLogin() {
 
         try {
             // TODO: Send POST request to http://localhost:8081/login using fetch with requestOptions
-            const url = "http://localhost:8081/login";
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(requestOptions)
-            });
+            const url = BASE_URL + "/login";
+            const response = await fetch(url, requestOptions);
 
             // TODO: If response status is 200
             if (response.status === 200) {   
                 // - Read the response as text
                 // - Response will be a space-separated string: "token123 true"
                 const responseText = await response.text();
-                const responseArr = responseText.split(/\s+/);
+                const responseArr = responseText.split(" ");
                 // - Split the string into token and isAdmin flag
                 const token = responseArr[0];
                 const isAdmin = responseArr[1];
@@ -101,8 +96,9 @@ async function processLogin() {
 
                 // TODO: Add a small delay (e.g., 500ms) using setTimeout before redirecting
                 // - Use window.location.href to redirect to the recipe page
+                //const filename = "file:///workspace/CodeCode-123-PEP-GP-WebDevProject_Recipe/src/main/resources/public/frontend/recipe/recipe-page.html";
                 setTimeout(function() {
-                    window.location.href = "http://localhost:8081/recipes/recipe-page.html"
+                    window.location.href = "../recipe/recipe-page.html";
                 }, 500);
             } else if (response.status === 401) {
                 // TODO: If response status is 401
@@ -111,14 +107,13 @@ async function processLogin() {
             } else {
                 // TODO: For any other status code
                 // - Alert the user with a generic error like "Unknown issue!"
-                alert("Unknown issue!");
                 console.error("Error fetching data:", response.status, response.statusText);
             }
         } catch (error) {
             // TODO: Handle any network or unexpected errors
             // - Log the error and alert the user
             console.error("Error:", error);
-            alert("Network or unexpected errors!");
+            //alert("Network or unexpected errors!");
         }
     }
 }

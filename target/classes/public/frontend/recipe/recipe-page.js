@@ -3,6 +3,7 @@
  */
 
 const BASE_URL = "http://localhost:8081"; // backend URL
+//const filename = "/workspace/CodeCode-123-PEP-GP-WebDevProject_Recipe/src/main/resources/public/frontend";
 
 let recipes = [];
 
@@ -86,7 +87,7 @@ window.addEventListener("DOMContentLoaded", () => {
         // Implement search logic here
         const searchTermInputValue = searchInput.value.trim();
         try {
-            const response = await fetch(BASE_URL + "/recipes/recipe-page.html?name=" + searchTermInputValue);
+            const response = await fetch(BASE_URL + "/recipes?name=" + searchTermInputValue);
 
             if (response.ok) {
                 refreshRecipeList();
@@ -117,14 +118,28 @@ window.addEventListener("DOMContentLoaded", () => {
             addRecipeInstructionsInputValue.length > 0 && 
             token.length > 0) {
             try {
-                const response = await fetch(BASE_URL + "/recipes/recipe-page.html", {
+                const requestBody = {
+                    name: addRecipeNameInputValue, 
+                    instructions: addRecipeInstructionsInputValue
+                };
+
+                const requestOptions = {
                     method: "POST",
+                    mode: "cors",
+                    cache: "no-cache",
+                    credentials: "same-origin",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
+                        "Authorization": `Bearer ${token}`,
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Headers": "*"
                     },
-                    body: JSON.stringify(new Recipe(addRecipeNameInputValue, addRecipeInstructionsInputValue))
-                });
+                    redirect: "follow",
+                    referrerPolicy: "no-referrer",
+                    body: JSON.stringify(requestBody)
+                };
+
+                const response = await fetch(BASE_URL + "/recipes", requestOptions);
                 
                 if (response.status === 201) {
                     addRecipeNameInput.value = "";
@@ -164,7 +179,7 @@ window.addEventListener("DOMContentLoaded", () => {
                     element.setInstructions(updateRecipeInstructionsInputValue);
                     if (id) {
                         try {
-                            const response = fetch(BASE_URL + `/recipes/recipe-page.html/${id}`, {
+                            const response = fetch(BASE_URL + `/recipes/${id}`, {
                                 method: "PUT",
                                 headers: {
                                     "Content-Type": "application/json"
@@ -203,16 +218,16 @@ window.addEventListener("DOMContentLoaded", () => {
      */
     async function deleteRecipe() {
         // Implement delete logic here
-        const deleteRecipeNameInputValue = deleteRecipeNameInput.value.trim();
-        const elements = recipes;
-        let isFound = false;
-        for (const element of elements) {
-            if (element.textContent === deleteRecipeNameInputValue) {
-                const id = element.getId();
-                isFound = true;
-                if (id) {
-                    try {
-                        const response = await fetch(BASE_URL + `/recipes/recipe-page.html/${id}`, {
+        try {
+            const deleteRecipeNameInputValue = deleteRecipeNameInput.value.trim();
+            const elements = recipes;
+            let isFound = false;
+            for (const element of elements) {
+                if (element.textContent === deleteRecipeNameInputValue) {
+                    const id = element.getId();
+                    isFound = true;
+                    if (id) {
+                        const response = await fetch(BASE_URL + `/recipes/${id}`, {
                             method: "DELETE"
                         });
 
@@ -221,19 +236,20 @@ window.addEventListener("DOMContentLoaded", () => {
                             getRecipes();
                             refreshRecipeList();
                         } else {
-                            console.error("Error fetching data:", response.status, response.statusText);
-                            alert("Delete recipe failed.");
+                            //alert("Delete recipe failed.");
+                            console.error("Error fetching data:", response.status, response.statusText); 
                         }
-                    } catch(error) {
-                        console.error("Error:", error);
-                        alert("Delete recipe failed.");
+                        break;
                     }
-                }
-                break;
+                } 
+            }  
+            if (isFound === false) {
+                //alert("Recipe not found.");
+                console.error("Error:", error);
             }
-        }
-        if (isFound === false) {
-            alert("Recipe not found.");
+        } catch(error) {
+            // alert("Delete recipe failed.");
+            console.error("Error:", error);
         }
     }
 
@@ -246,7 +262,7 @@ window.addEventListener("DOMContentLoaded", () => {
     async function getRecipes() {
         // Implement get logic here
         try {
-            const response = await fetch(BASE_URL + "/recipes/recipe-page.html");
+            const response = await fetch(BASE_URL + "/recipes");
 
             if (response.ok) {
                 let data = await response.json();
@@ -255,17 +271,23 @@ window.addEventListener("DOMContentLoaded", () => {
                     const name = data[i].getName();
                     const instructions = data[i].getInstructions();
                     const author = data[i].getAuthor();
-                    recipes.push(new Recipe(id, name, instructions, author));
+                    const newObject = {
+                        id: id,
+                        name: name,
+                        instructions: instructions,
+                        author: author
+                    }
+                    recipes.push(newObject);
                 }
 
                 refreshRecipeList();
             } else {
                 console.error("Error fetching data:", response.status, response.statusText);
-                alert("Get recipes failed.");
+                //alert("Get recipes failed.");
             }
         } catch(error) {
             console.error("Error:", error);
-            alert("Get recipes failed.");
+            //alert("Get recipes failed.");
         }
     }
 
@@ -282,11 +304,11 @@ window.addEventListener("DOMContentLoaded", () => {
         }
         for (let i = 0; i < recipes.length; i++) {
             const recipe = recipes[i];
-            const name = recipe.getName();
-            const instructions = recipe.getInstructions();
+            const name = recipe.name;
+            const instructions = recipe.instructions;
             const li = document.createElement("li");
             const p = document.createElement("p");
-            p.textContent = recipe.getName() + ": " + recipe.getInstructions();
+            p.textContent = name + ": " + instructions;
             li.appendChild(p);
             recipeListContainer.appendChild(li);
         }
@@ -312,13 +334,13 @@ window.addEventListener("DOMContentLoaded", () => {
             });
 
             if (response.ok) {
-                sessionStorage.setItem("auth-token", "");
-                sessionStorage.setItem("is-admin", "false");
+                sessionStorage.setItem("auth-token", null);
+                sessionStorage.setItem("is-admin", "true");
 
                 logoutButton.style.visibility = "hidden";
-
+                
                 setTimeout(function() {
-                    window.location.href = "http://localhost:8081/login"
+                    window.location.href = "../login/login-page.html";
                 }, 500);
             } else {
                 console.error("Error fetching data:", response.status, response.statusText);

@@ -89,7 +89,7 @@ async function processRegistration() {
                 
                 if (response.status === 201) {
                     setTimeout(function() {
-                        window.location.href = "http://localhost:8081/login"
+                        window.location.href = "../login/login-page.html";
                     }, 500);
                 } else if (response.status === 409) {
                     alert("Email already existed.");

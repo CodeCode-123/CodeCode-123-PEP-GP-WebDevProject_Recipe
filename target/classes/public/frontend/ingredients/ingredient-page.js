@@ -60,14 +60,27 @@ async function addIngredient() {
     const token = sessionStorage.getItem("auth-token");
     if (addIngredientNameInputValue.length > 0) {
         try {
-            const response = await fetch(BASE_URL + "/ingredients", {
+            const requestBody = {
+                name: addIngredientNameInputValue
+            };
+
+            const requestOptions = {
                 method: "POST",
+                mode: "cors",
+                cache: "no-cache",
+                credentials: "same-origin",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
+                    "Authorization": `Bearer ${token}`,
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "*"
                 },
-                body: JSON.stringify(new Ingredient(addIngredientNameInputValue))
-            });
+                redirect: "follow",
+                referrerPolicy: "no-referrer",
+                body: JSON.stringify(requestBody)
+            };
+
+            const response = await fetch(BASE_URL + "/ingredients", requestOptions);
 
             if (response.ok) {
                 addIngredientNameInput.value = "";
@@ -81,7 +94,8 @@ async function addIngredient() {
             alert("Adding ingredient failed.");
         }
     } else {
-        alert("Adding ingredient failed.");
+        //alert("Adding ingredient failed.");
+        console.error("Adding ingredient failed.");
     }
 }
 
@@ -105,7 +119,11 @@ async function getIngredients() {
             for (let i = 0; i < data.length; i++) {
                 const id = data[i].getId;
                 const name = data[i].getName;
-                ingredients.push(new Ingredient(id, name));
+                const newObject = {
+                    id: id,
+                    name: name
+                };
+                ingredients.push(newObject);
             }
 
             refreshIngredientList();
