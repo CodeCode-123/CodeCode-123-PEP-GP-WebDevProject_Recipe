@@ -93,7 +93,7 @@ async function addIngredient() {
             alert("Adding ingredient failed.");
         }
     } else {
-        alert("Adding ingredient failed.");
+        //alert("Adding ingredient failed.");
         console.error("Adding ingredient failed.");
     }
 }
@@ -129,6 +129,7 @@ async function getIngredients() {
             refreshIngredientList();
         } else {
             console.error("Error fetching data:", response.status, response.statusText);
+            alert("Get ingredients failed.");
         }
     } catch(error) {
         console.error("Error:", error);
@@ -168,7 +169,7 @@ async function deleteIngredient() {
                         deleteIngredientNameInput.value = "";
                     } else {
                         console.error("Error fetching data:", response.status, response.statusText);
-                        //alert("Delete ingredient failed.");
+                        alert("Delete ingredient failed.");
                     }
                 } catch(error) {
                     console.error("Error:", error);
@@ -180,7 +181,7 @@ async function deleteIngredient() {
 
     }
     if (isFound === false) {
-        alert("Ingredient not found.");
+        //alert("Ingredient not found.");
         console.error("Error:", error);
     }
 }

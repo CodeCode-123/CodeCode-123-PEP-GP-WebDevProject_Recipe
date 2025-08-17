@@ -331,6 +331,7 @@ window.addEventListener("DOMContentLoaded", () => {
     async function processLogout() {
         // Implement logout logic here
         const token = sessionStorage.getItem("auth-token").trim();
+
         try {
             const response = await fetch(BASE_URL + "/logout", {
                 method: "POST",
@@ -345,7 +346,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 sessionStorage.setItem("auth-token", null);
                 sessionStorage.setItem("is-admin", "false");
 
-                logoutButton.style.visibility = "hidden";
+                //logoutButton.style.visibility = "hidden";
                 
                 setTimeout(function() {
                     window.location.href = "../login/login-page.html";
