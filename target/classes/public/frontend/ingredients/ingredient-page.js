@@ -31,7 +31,6 @@ const BASE_URL = "http://localhost:8081"; // backend URL
     addIngredientSubmitButton.onclick = addIngredient();
     deleteIngredientSubmitButton.onclick = deleteIngredient();
 
-    
 
     /*
     * TODO: Create an array to keep track of ingredients
@@ -58,43 +57,55 @@ const BASE_URL = "http://localhost:8081"; // backend URL
  */
 async function addIngredient() {
     // Implement add ingredient logic here
-    let addIngredientNameInputValue = addIngredientNameInput.value.trim();
-    const token = sessionStorage.getItem("auth-token").trim();
-    if (addIngredientNameInputValue.length > 0 && token.length > 0) {
-        try {
-            const requestBody = {
-                name: addIngredientNameInputValue
-            };
+    if (sessionStorage.getItem("is-admin") === "true") {
+        let addIngredientNameInputValue = addIngredientNameInput.value.trim();
+        const token = sessionStorage.getItem("auth-token").trim();
+        if (addIngredientNameInputValue.length > 0 && token.length > 0) {
+            try {
+                const requestBody = {
+                    name: addIngredientNameInputValue
+                };
 
-            const requestOptions = {
-                method: "POST",
-                mode: "cors",
-                cache: "no-cache",
-                credentials: "same-origin",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`,
-                    "Access-Control-Allow-Origin": "*",
-                    "Access-Control-Allow-Headers": "*"
-                },
-                redirect: "follow",
-                referrerPolicy: "no-referrer",
-                body: JSON.stringify(requestBody)
-            };
+                const requestOptions = {
+                    method: "POST",
+                    mode: "cors",
+                    cache: "no-cache",
+                    credentials: "same-origin",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
+                        "Access-Control-Allow-Origin": "*",
+                        "Access-Control-Allow-Headers": "*"
+                    },
+                    redirect: "follow",
+                    referrerPolicy: "no-referrer",
+                    body: JSON.stringify(requestBody)
+                };
 
-            const response = await fetch(BASE_URL + "/ingredients", requestOptions);
+                // ingredients.push(requestBody);
+                // let newChild = document.createElement("li");
+                // let p = document.createElement("p");
+                // p.textContent = addIngredientNameInputValue;
+                // newChild.appendChild(p);
+                // ingredientListContainer.appendChild(newChild);
 
-            if (response.status === 201) {
-                addIngredientNameInput.value = "";
-                getIngredients();
-                refreshIngredientList();
-            } else {
-                console.error("Error fetching data:", response.status, response.statusText);
+                const response = await fetch(BASE_URL + "/ingredients", requestOptions);
+
+                if (response.status === 201) {
+                    addIngredientNameInput.value = "";
+                    getIngredients();
+                    refreshIngredientList();
+                } else {
+                    console.error("Error fetching data:", response.status, response.statusText);
+                    alert("Adding ingredient failed.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
                 alert("Adding ingredient failed.");
             }
-        } catch (error) {
-            console.error("Error:", error);
-            alert("Adding ingredient failed.");
+        } else {
+            //alert("Adding ingredient failed.");
+            console.error("Adding ingredient failed.");
         }
     } else {
         //alert("Adding ingredient failed.");
@@ -128,7 +139,6 @@ async function getIngredients() {
             ingredients.push(newObject);
         }
         refreshIngredientList();
-
     } catch(error) {
         console.error("Error:", error);
         alter("Get ingredients failed.");
@@ -149,37 +159,47 @@ async function getIngredients() {
  */
 async function deleteIngredient() {
     // Implement delete ingredient logic here
-    let deleteIngredientNameInputValue = deleteIngredientNameInput.value.trim();
-    let isFound = false;
-    for (let i = 0; i < ingredients.length; i++) {
-        if (ingredients[i].name === deleteIngredientNameInputValue) {
-            isFound = true;
-            const id = ingredients[i].id;
-            if (id) {
-                try {
-                    const response = await fetch(BASE_URL + `/ingredients/${id}`, {
-                        method: "DELETE"
-                    });
+    if (sessionStorage.getItem("is-admin") === "true") {
+        let deleteIngredientNameInputValue = deleteIngredientNameInput.value.trim();
+        let isFound = false;
+        for (let i = 0; i < ingredients.length; i++) {
+            if (ingredients[i].name == deleteIngredientNameInputValue) {
+                isFound = true;
+                const id = ingredients[i].id;
 
-                    if (response.status === 204) {
-                        getIngredients();
-                        refreshIngredientList();
-                        deleteIngredientNameInput.value = "";
-                    } else {
-                        console.error("Error fetching data:", response.status, response.statusText);
-                        alert("Delete ingredient failed.");
+                // ingredients.splice(i, 1);
+                // let deletedChild = document.createElement("li");
+                // let p = document.createElement("p");
+                // p.textContent = deleteIngredientNameInputValue;
+                // deletedChild.appendChild(p);
+                // ingredientListContainer.removeChild(deletedChild);
+
+                if (id) {
+                    try {
+                        const response = await fetch(BASE_URL + `/ingredients/${id}`, {
+                            method: "DELETE"
+                        });
+
+                        if (response.status === 204) {
+                            getIngredients();
+                            refreshIngredientList();
+                            deleteIngredientNameInput.value = "";
+                        } else {
+                            console.error("Error fetching data:", response.status, response.statusText);
+                            alert("Delete ingredient failed.");
+                        }
+                    } catch(error) {
+                        console.error("Error:", error);
+                        alter("Delete ingredients failed.");
                     }
-                } catch(error) {
-                    console.error("Error:", error);
-                    alter("Delete ingredients failed.");
                 }
-            }
-            break;
-        }     
-    }
-    if (isFound === false) {
-        alert("Ingredient not found.");
-        console.error("Error:", error);
+                break;
+            }     
+        }
+        if (isFound === false) {
+            alert("Ingredient not found.");
+            console.error("Error:", error);
+        }
     }
 }
 
