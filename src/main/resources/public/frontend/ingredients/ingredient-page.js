@@ -26,8 +26,11 @@ const BASE_URL = "http://localhost:8081"; // backend URL
     * - "add-ingredient-submit-button" → addIngredient()
     * - "delete-ingredient-submit-button" → deleteIngredient()
     */
-    addIngredientSubmitButton.addEventListener("click", addIngredient);
-    deleteIngredientSubmitButton.addEventListener("click", deleteIngredient);
+    //addIngredientSubmitButton.addEventListener("click", addIngredient);
+    //deleteIngredientSubmitButton.addEventListener("click", deleteIngredient);
+    addIngredientSubmitButton.onclick = addIngredient();
+    deleteIngredientSubmitButton.onclick = deleteIngredient();
+
     
 
     /*
@@ -39,7 +42,7 @@ const BASE_URL = "http://localhost:8081"; // backend URL
     /*
     * TODO: On page load, call getIngredients()
     */
-   window.onload = addIngredient;
+   window.onload = getIngredients();
 
 
 /**
@@ -56,8 +59,8 @@ const BASE_URL = "http://localhost:8081"; // backend URL
 async function addIngredient() {
     // Implement add ingredient logic here
     let addIngredientNameInputValue = addIngredientNameInput.value.trim();
-    const token = sessionStorage.getItem("auth-token");
-    if (addIngredientNameInputValue.length > 0) {
+    const token = sessionStorage.getItem("auth-token").trim();
+    if (addIngredientNameInputValue.length > 0 && token.length > 0) {
         try {
             const requestBody = {
                 name: addIngredientNameInputValue
@@ -81,7 +84,7 @@ async function addIngredient() {
 
             const response = await fetch(BASE_URL + "/ingredients", requestOptions);
 
-            if (response.ok) {
+            if (response.status === 201) {
                 addIngredientNameInput.value = "";
                 getIngredients();
                 refreshIngredientList();
@@ -113,25 +116,19 @@ async function getIngredients() {
     // Implement get ingredients logic here
     try {
         const response = await fetch(BASE_URL + "/ingredients");
-
-        if (response.ok) {
-            ingredients = [];
-            let data = await response.json();
-            for (let i = 0; i < data.length; i++) {
-                const id = data[i].id;
-                const name = data[i].name;
-                const newObject = {
-                    id: id,
-                    name: name
-                };
-                ingredients.push(newObject);
-            }
-
-            refreshIngredientList();
-        } else {
-            console.error("Error fetching data:", response.status, response.statusText);
-            alert("Get ingredients failed.");
+        ingredients = [];
+        let data = await response.json();
+        for (let i = 0; i < data.length; i++) {
+            const id = data[i].id;
+            const name = data[i].name;
+            const newObject = {
+                id: id,
+                name: name
+            };
+            ingredients.push(newObject);
         }
+        refreshIngredientList();
+
     } catch(error) {
         console.error("Error:", error);
         alter("Get ingredients failed.");
@@ -155,7 +152,7 @@ async function deleteIngredient() {
     let deleteIngredientNameInputValue = deleteIngredientNameInput.value.trim();
     let isFound = false;
     for (let i = 0; i < ingredients.length; i++) {
-        if (ingredients[i].name == deleteIngredientNameInputValue) {
+        if (ingredients[i].name === deleteIngredientNameInputValue) {
             isFound = true;
             const id = ingredients[i].id;
             if (id) {
@@ -181,7 +178,7 @@ async function deleteIngredient() {
         }     
     }
     if (isFound === false) {
-        //alert("Ingredient not found.");
+        alert("Ingredient not found.");
         console.error("Error:", error);
     }
 }
@@ -199,14 +196,11 @@ async function deleteIngredient() {
  */
 function refreshIngredientList() {
     // Implement ingredient list rendering logic here
-    // while (ingredientListContainer.firstChild) {
-    //     ingredientListContainer.removeChild(ingredientListContainer.firstChild);
-    // }
     ingredientListContainer.innerHTML = "";
     for (let i = 0; i < ingredients.length; i++) {
         let li = document.createElement("li");
         let p = document.createElement("p");
-        p.textContent = ingredient[i].name;
+        p.textContent = ingredients[i].name;
         li.appendChild(p);
         ingredientListContainer.appendChild(li);
     }

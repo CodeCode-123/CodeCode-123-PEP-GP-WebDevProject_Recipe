@@ -42,9 +42,11 @@ window.addEventListener("DOMContentLoaded", () => {
     /*
      * TODO: Show logout button if auth-token exists in sessionStorage
      */
-    const token = sessionStorage.getItem("auth-token");
-    if (token != null && token.trim().length > 0) {
+    const token = sessionStorage.getItem("auth-token").trim();
+    if (token) {
         logoutButton.style.visibility = "visible";
+    } else {
+        logoutButton.style.visibility = "hidden";
     }
 
 
@@ -54,6 +56,8 @@ window.addEventListener("DOMContentLoaded", () => {
     const isAdmin = sessionStorage.getItem("is-admin").trim();
     if (isAdmin === "true") {
         adminLink.style.visibility = "visible";
+    } else {
+        adminLink.style.visibility = "hidden";
     }
 
 
@@ -354,9 +358,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
             if (response.ok) {
                 sessionStorage.setItem("auth-token", null);
-                sessionStorage.setItem("is-admin", "false");
-
-                //logoutButton.style.visibility = "hidden";
+                sessionStorage.setItem("is-admin", null);
+                
                 setTimeout(function() {
                     window.location.href = "../login/login-page.html";
                 }, 500);

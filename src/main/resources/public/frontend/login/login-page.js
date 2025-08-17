@@ -15,6 +15,7 @@ let usernameInput = document.getElementById("login-input");
 let passwordInput = document.getElementById("password-input");
 let loginButton = document.getElementById("login-button");
 let logoutButton = document.getElementById("logout-button");
+let adminLink = document.getElementById("admin-link");
 
 /* 
  * TODO: Add click event listener to login button
@@ -86,10 +87,10 @@ async function processLogin() {
                 const responseArr = responseText.split(/\s+/);
                 // - Split the string into token and isAdmin flag
                 const token = responseArr[0];
-                //const isAdmin = responseArr[1];
+                const isAdmin = responseArr[1];
                 // - Store both in sessionStorage using sessionStorage.setItem()
                 sessionStorage.setItem("auth-token", token);
-                sessionStorage.setItem("is-admin", "true");
+                sessionStorage.setItem("is-admin", isAdmin);
 
                 // TODO: Optionally show the logout button if applicable
                 logoutButton.style.visibility = "visible";
@@ -100,6 +101,7 @@ async function processLogin() {
                 setTimeout(function() {
                     window.location.href = "../recipe/recipe-page.html";
                 }, 500);
+
             } else if (response.status === 401) {
                 // TODO: If response status is 401
                 // - Alert the user with "Incorrect login!"
