@@ -181,7 +181,8 @@ async function deleteIngredient() {
 
     }
     if (isFound === false) {
-        alert("Ingredient not found.");
+        //alert("Ingredient not found.");
+        console.error("Error:", error);
     }
 }
 
