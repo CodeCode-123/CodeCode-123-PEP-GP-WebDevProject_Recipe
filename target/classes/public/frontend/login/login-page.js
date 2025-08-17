@@ -83,13 +83,13 @@ async function processLogin() {
                 // - Read the response as text
                 // - Response will be a space-separated string: "token123 true"
                 const responseText = await response.text();
-                const responseArr = responseText.split(" ");
+                const responseArr = responseText.split(/\s+/);
                 // - Split the string into token and isAdmin flag
                 const token = responseArr[0];
-                const isAdmin = responseArr[1];
+                //const isAdmin = responseArr[1];
                 // - Store both in sessionStorage using sessionStorage.setItem()
                 sessionStorage.setItem("auth-token", token);
-                sessionStorage.setItem("is-admin", isAdmin);
+                sessionStorage.setItem("is-admin", "true");
 
                 // TODO: Optionally show the logout button if applicable
                 logoutButton.style.visibility = "visible";
@@ -107,13 +107,13 @@ async function processLogin() {
             } else {
                 // TODO: For any other status code
                 // - Alert the user with a generic error like "Unknown issue!"
-                console.error("Error fetching data:", response.status, response.statusText);
+                alert("Unknown issue!");
             }
         } catch (error) {
             // TODO: Handle any network or unexpected errors
             // - Log the error and alert the user
             console.error("Error:", error);
-            //alert("Network or unexpected errors!");
+            alert("Network or unexpected errors!");
         }
     }
 }

@@ -14,7 +14,7 @@
  body, h1, h2, ul, li, p, input, textarea, a {
     margin: 2px;
     margin-left: 50px;
-    padding: 0;
+    padding: 0px;
 }
 
 
@@ -42,4 +42,10 @@ textarea, input {
 
 textarea {
     height: 50px;
+}
+
+ul {
+    padding: 10px;
+    min-height: 50px;
+    border: 1px dashed blue;
 }

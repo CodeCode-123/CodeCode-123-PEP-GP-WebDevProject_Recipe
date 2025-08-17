@@ -17,8 +17,8 @@ const BASE_URL = "http://localhost:8081"; // backend URL
     let deleteIngredientNameInput = document.getElementById("delete-ingredient-name-input");
     let deleteIngredientSubmitButton = document.getElementById("delete-ingredient-submit-button");
     let ingredientListContainer = document.getElementById("ingredient-list");
-    //let searchInput = document.querySelectorAll("li");
-    let adminLink = document.getElementById("back-link");
+    let backLink = document.getElementById("back-link");
+    let adminLink = document.getElementById("admin-link");
 
     /*
     * TODO: Attach 'onclick' events to:
@@ -27,9 +27,7 @@ const BASE_URL = "http://localhost:8081"; // backend URL
     */
     addIngredientSubmitButton.addEventListener("click", addIngredient);
     deleteIngredientSubmitButton.addEventListener("click", deleteIngredient);
-    // addIngredientSubmitButton.onclick = addIngredient;
-    // deleteIngredientSubmitButton.onclick = deleteIngredient;
-
+    
 
     /*
     * TODO: Create an array to keep track of ingredients
@@ -94,7 +92,7 @@ async function addIngredient() {
             alert("Adding ingredient failed.");
         }
     } else {
-        //alert("Adding ingredient failed.");
+        alert("Adding ingredient failed.");
         console.error("Adding ingredient failed.");
     }
 }
@@ -170,6 +168,7 @@ async function deleteIngredient() {
                         deleteIngredientNameInput.value = "";
                     } else {
                         console.error("Error fetching data:", response.status, response.statusText);
+                        //alert("Delete ingredient failed.");
                     }
                 } catch(error) {
                     console.error("Error:", error);
@@ -181,7 +180,7 @@ async function deleteIngredient() {
 
     }
     if (isFound === false) {
-        //alert("Ingredient not found.");
+        alert("Ingredient not found.");
         console.error("Error:", error);
     }
 }

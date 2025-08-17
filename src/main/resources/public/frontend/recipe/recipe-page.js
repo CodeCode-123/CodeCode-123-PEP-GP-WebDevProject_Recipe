@@ -32,6 +32,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
    let adminLink = document.getElementById("admin-link");
    let logoutButton = document.getElementById("logout-button");
+   let backLink = document.getElementById("back-link");
 
    let searchInput = document.getElementById("search-input");
    let searchInputButton = document.getElementById("search-button");
@@ -148,14 +149,15 @@ window.addEventListener("DOMContentLoaded", () => {
                     refreshRecipeList();
                 } else {
                     console.error("Error fetching data:", response.status, response.statusText);
-                    alert("Add recipe failed.");
+                    //alert("Add recipe failed.");
                 }
             } catch(error) {
                 console.error("Error:", error);
-                alert("Add recipe failed.");
+                //alert("Add recipe failed.");
             }
         } else {
-            alert("Add recipe failed.");
+            console.error("Error:", error);
+            //alert("Add recipe failed.");
         }
     }
 
@@ -194,18 +196,19 @@ window.addEventListener("DOMContentLoaded", () => {
                                 refreshRecipeList();
                             } else {
                                 console.error("Error fetching data:", response.status, response.statusText);
-                                alert("Update recipe failed.");
+                                //alert("Update recipe failed.");
                             }
                         } catch(error) {
                             console.error("Error:", error);
-                            alert("Update recipe failed.");
+                            //alert("Update recipe failed.");
                         }
                     }
                     break;
                 }
             }
         } else {
-            alert("Update recipe failed.");
+            console.error("Error:", error);
+            //alert("Update recipe failed.");
         }
     }
 
@@ -233,7 +236,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
                         if (response.ok) {
                             deleteRecipeNameInput.value = "";
-                            getRecipes();
+                            //getRecipes();
                             refreshRecipeList();
                         } else {
                             //alert("Delete recipe failed.");
@@ -330,12 +333,13 @@ window.addEventListener("DOMContentLoaded", () => {
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
-                }
+                },
+                body: JSON.stringify(sessionStorage)
             });
 
             if (response.ok) {
                 sessionStorage.setItem("auth-token", null);
-                sessionStorage.setItem("is-admin", "true");
+                sessionStorage.setItem("is-admin", "false");
 
                 logoutButton.style.visibility = "hidden";
                 
