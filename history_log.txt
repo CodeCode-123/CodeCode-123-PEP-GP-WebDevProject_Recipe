@@ -1,7 +1,7 @@
-commit 3009b97530e4703438bf77184de3e17ddac07293
+commit 02dcac1cc87dac22dfdb2259cdc260a27b4dbb5e
 Author: Shen Tang <adatang23@yahoo.com>
-Date:   Sun Aug 17 22:32:51 2025 +0000
+Date:   Mon Aug 18 00:57:54 2025 +0000
 
-    Updated Project-3
+    Completed Project-3 GP- Recipe Project Part 2
 
- 3 files changed, 175 insertions(+), 135 deletions(-)
+ 9 files changed, 95 insertions(+), 173 deletions(-)
