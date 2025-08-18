@@ -3,7 +3,6 @@
  */
 
 const BASE_URL = "http://localhost:8081"; // backend URL
-//const filename = "/workspace/CodeCode-123-PEP-GP-WebDevProject_Recipe/src/main/resources/public/frontend";
 
 let recipes = [];
 
@@ -74,13 +73,7 @@ window.addEventListener("DOMContentLoaded", () => {
     deleteRecipeSubmitButton.addEventListener("click", deleteRecipe);
     searchInputButton.addEventListener("click", searchRecipes);
     logoutButton.addEventListener("click", processLogout);
-    deleteRecipeSubmitButton.addEventListener("click", function() {
-        if (sessionStorage.getItem("is-admin") != "true" || sessionStorage.getItem("auth-token") == null) {
-            alert("Not admin");
-        }
-    });
   
-
 
     /*
      * TODO: On page load, call getRecipes() to populate the list
@@ -117,6 +110,7 @@ window.addEventListener("DOMContentLoaded", () => {
             alert("Search recipes failed.");
         }
     }
+
 
     /**
      * TODO: Add Recipe Function
@@ -165,17 +159,15 @@ window.addEventListener("DOMContentLoaded", () => {
                     refreshRecipeList();
                 } else {
                     console.error("Error fetching data:", response.status, response.statusText);
-                    //alert("Add recipe failed.");
                 }
             } catch(error) {
                 console.error("Error:", error);
-                //alert("Add recipe failed.");
             }
         } else {
             console.error("Error:", error);
-            //alert("Add recipe failed.");
         }
     }
+
 
     /**
      * TODO: Update Recipe Function
@@ -208,14 +200,13 @@ window.addEventListener("DOMContentLoaded", () => {
                             if (response.ok) {
                                 updateRecipeNameInput.value = "";
                                 updateRecipeInstructionsInput.value = "";
+                                getRecipes();
                                 refreshRecipeList();
                             } else {
                                 console.error("Error fetching data:", response.status, response.statusText);
-                                //alert("Update recipe failed.");
                             }
                         } catch(error) {
                             console.error("Error:", error);
-                            //alert("Update recipe failed.");
                         }
                     }
                     break;
@@ -223,9 +214,9 @@ window.addEventListener("DOMContentLoaded", () => {
             }
         } else {
             console.error("Error:", error);
-            //alert("Update recipe failed.");
         }
     }
+
 
     /**
      * TODO: Delete Recipe Function
@@ -273,6 +264,7 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+
     /**
      * TODO: Get Recipes Function
      * - Fetch all recipes from backend
@@ -303,13 +295,12 @@ window.addEventListener("DOMContentLoaded", () => {
                 refreshRecipeList();
             } else {
                 console.error("Error fetching data:", response.status, response.statusText);
-                //alert("Get recipes failed.");
             }
         } catch(error) {
             console.error("Error:", error);
-            //alert("Get recipes failed.");
         }
     }
+
 
     /**
      * TODO: Refresh Recipe List Function
@@ -319,9 +310,6 @@ window.addEventListener("DOMContentLoaded", () => {
      */
     function refreshRecipeList() {
         // Implement refresh logic here
-        // while (recipeListContainer.firstChild) {
-        //     recipeListContainer.removeChild(recipeListContainer.firstChild);
-        // }
         recipeListContainer.innerHTML = "";
         for (let i = 0; i < recipes.length; i++) {
             const recipe = recipes[i];
@@ -334,6 +322,7 @@ window.addEventListener("DOMContentLoaded", () => {
             recipeListContainer.appendChild(li);
         }
     }
+
 
     /**
      * TODO: Logout Function
@@ -372,5 +361,4 @@ window.addEventListener("DOMContentLoaded", () => {
             alert("Process logout failed.");
         }
     }
-
 });

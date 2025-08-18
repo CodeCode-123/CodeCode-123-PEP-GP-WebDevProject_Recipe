@@ -3,8 +3,4 @@
 
  * It should define the visual appearance of the recipe list, forms, and other related elements.
  */
- ul {
-    padding: 10px;
-    min-height: 50px;
-    border: 1px dashed blue;
-}
+

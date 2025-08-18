@@ -26,17 +26,13 @@ const BASE_URL = "http://localhost:8081"; // backend URL
     * - "add-ingredient-submit-button" → addIngredient()
     * - "delete-ingredient-submit-button" → deleteIngredient()
     */
-    //addIngredientSubmitButton.addEventListener("click", addIngredient);
-    //deleteIngredientSubmitButton.addEventListener("click", deleteIngredient);
-    addIngredientSubmitButton.onclick = addIngredient();
-    deleteIngredientSubmitButton.onclick = deleteIngredient();
-
-
+    addIngredientSubmitButton.addEventListener("click", addIngredient);
+    deleteIngredientSubmitButton.addEventListener("click", deleteIngredient);
+    
     /*
     * TODO: Create an array to keep track of ingredients
     */
    let ingredients = [];
-
 
     /*
     * TODO: On page load, call getIngredients()
@@ -57,7 +53,7 @@ const BASE_URL = "http://localhost:8081"; // backend URL
  */
 async function addIngredient() {
     // Implement add ingredient logic here
-    if (sessionStorage.getItem("is-admin") === "true") {
+    if (sessionStorage.getItem("auth-token") != null) {
         let addIngredientNameInputValue = addIngredientNameInput.value.trim();
         const token = sessionStorage.getItem("auth-token").trim();
         if (addIngredientNameInputValue.length > 0 && token.length > 0) {
@@ -77,17 +73,8 @@ async function addIngredient() {
                         "Access-Control-Allow-Origin": "*",
                         "Access-Control-Allow-Headers": "*"
                     },
-                    redirect: "follow",
-                    referrerPolicy: "no-referrer",
                     body: JSON.stringify(requestBody)
                 };
-
-                // ingredients.push(requestBody);
-                // let newChild = document.createElement("li");
-                // let p = document.createElement("p");
-                // p.textContent = addIngredientNameInputValue;
-                // newChild.appendChild(p);
-                // ingredientListContainer.appendChild(newChild);
 
                 const response = await fetch(BASE_URL + "/ingredients", requestOptions);
 
@@ -104,11 +91,11 @@ async function addIngredient() {
                 alert("Adding ingredient failed.");
             }
         } else {
-            //alert("Adding ingredient failed.");
+            alert("Adding ingredient failed.");
             console.error("Adding ingredient failed.");
         }
     } else {
-        //alert("Adding ingredient failed.");
+        alert("Adding ingredient failed.");
         console.error("Adding ingredient failed.");
     }
 }
@@ -159,47 +146,37 @@ async function getIngredients() {
  */
 async function deleteIngredient() {
     // Implement delete ingredient logic here
-    if (sessionStorage.getItem("is-admin") === "true") {
-        let deleteIngredientNameInputValue = deleteIngredientNameInput.value.trim();
-        let isFound = false;
-        for (let i = 0; i < ingredients.length; i++) {
-            if (ingredients[i].name == deleteIngredientNameInputValue) {
-                isFound = true;
-                const id = ingredients[i].id;
+    let deleteIngredientNameInputValue = deleteIngredientNameInput.value.trim();
+    let isFound = false;
+    for (let i = 0; i < ingredients.length; i++) {
+        if (ingredients[i].name == deleteIngredientNameInputValue) {
+            isFound = true;
+            const id = ingredients[i].id;
+            if (id) {
+                try {
+                    const response = await fetch(BASE_URL + `/ingredients/${id}`, {
+                        method: "DELETE"
+                    });
 
-                // ingredients.splice(i, 1);
-                // let deletedChild = document.createElement("li");
-                // let p = document.createElement("p");
-                // p.textContent = deleteIngredientNameInputValue;
-                // deletedChild.appendChild(p);
-                // ingredientListContainer.removeChild(deletedChild);
-
-                if (id) {
-                    try {
-                        const response = await fetch(BASE_URL + `/ingredients/${id}`, {
-                            method: "DELETE"
-                        });
-
-                        if (response.status === 204) {
-                            getIngredients();
-                            refreshIngredientList();
-                            deleteIngredientNameInput.value = "";
-                        } else {
-                            console.error("Error fetching data:", response.status, response.statusText);
-                            alert("Delete ingredient failed.");
-                        }
-                    } catch(error) {
-                        console.error("Error:", error);
-                        alter("Delete ingredients failed.");
+                    if (response.status === 204) {
+                        getIngredients();
+                        refreshIngredientList();
+                        deleteIngredientNameInput.value = "";
+                    } else {
+                        console.error("Error fetching data:", response.status, response.statusText);
+                        alert("Delete ingredient failed.");
                     }
+                } catch(error) {
+                    console.error("Error:", error);
+                    alter("Delete ingredients failed.");
                 }
-                break;
-            }     
-        }
-        if (isFound === false) {
-            alert("Ingredient not found.");
-            console.error("Error:", error);
-        }
+            }
+            break;
+        }     
+    }
+    if (isFound === false) {
+        alert("Ingredient not found.");
+        console.error("Error:", error);
     }
 }
 
@@ -218,8 +195,8 @@ function refreshIngredientList() {
     // Implement ingredient list rendering logic here
     ingredientListContainer.innerHTML = "";
     for (let i = 0; i < ingredients.length; i++) {
-        let li = document.createElement("li");
-        let p = document.createElement("p");
+        const li = document.createElement("li");
+        const p = document.createElement("p");
         p.textContent = ingredients[i].name;
         li.appendChild(p);
         ingredientListContainer.appendChild(li);
